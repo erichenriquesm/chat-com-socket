@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="messages">
+
+    </div>
+
+    <label for="">Digite uma mensagem</label>
+    <br>
+    <input type="text" id="message">
+    <br>
+    <button onclick="sendMessage()">Enviar</button>
+
+    <script src="http://192.168.3.4:3000/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://192.168.3.4:3000');
+        const messageList = document.querySelector('.messages');
+        const user = 'eric';
+        const to = 'teste';
+
+        const insertMessage = (from, message) => {
+            const msg = document.createElement('p');
+            msg.innerText = `${from}: ${message}`;
+
+            messageList.appendChild(msg);
+            message.value = '';
+        }
+        
+        socket.on(`${to}_${user}`, (message) => {
+            insertMessage(to, message);
+        })
+
+        const sendMessage = () => {
+            const message = document.querySelector('#message');
+            if(!message.value){
+                return;
+            }
+
+            socket.emit('channel', `${user}_${to}`, message.value)
+
+            insertMessage(user, message.value);
+            message.value = '';
+        }
+    </script>
+</body>
+</html>
